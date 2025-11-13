@@ -1,114 +1,229 @@
-async function fetchNews() {
-  const res = await fetch('json/pomoika.json', { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to load news JSON');
-  return await res.json();
+async function getNewshub() {
+  const response = await fetch(`json/pomoika.json`);
+  const data = await response.json();
+  return await data;
+}
+async function getTournament() {
+  const response = await fetch(`json/tournament-news.json`);
+  const data = await response.json();
+  return await data;
 }
 
-function sanitize(html) {
-  const div = document.createElement('div');
-  div.innerHTML = html || '';
-  // Keep only text content for the brief description
-  return div.textContent || div.innerText || '';
-}
+let dataLength = 0;
+let clientSpawn = document.getElementById('clientSpawn');
+let clientContainer = document.querySelectorAll('.clientContainer');
+let clientMainFeature = document.querySelectorAll('.clientMainFeature');
 
-function fmtDate(iso) {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
-  } catch (_) {
-    return '';
+//downscale-fix
+let PICA = new pica({ features: ['js', 'wasm', 'cib', 'ww'] });
+
+let images = [];
+
+function rescaleToCanvas() {
+
+
+  // this part should position the canvas such that it matches the original
+  // background-image. the code assumes background image is centered and scaled
+  // to cover the div
+
+  let ratio = {
+    x: this.div.offsetWidth / this.width,
+    y: this.div.offsetHeight / this.height
+  };
+  let sizeCSS = {
+    x: 0,
+    y: 0
+  };
+  
+  if (ratio.x > ratio.y) {
+    let height = Math.round(this.height * ratio.x);
+    sizeCSS.x = this.div.offsetWidth;
+    sizeCSS.y = height;
+    this.cvs.style.top = Math.round((this.div.offsetHeight - height) / 2) + 'px';
+    this.cvs.style.left = '0';
+  } else {
+    let width = Math.round(this.width * ratio.y);
+    sizeCSS.x = width;
+    sizeCSS.y = this.div.offsetHeight;
+    this.cvs.style.left = Math.round((this.div.offsetWidth - width) / 2) + 'px';
+    this.cvs.style.top = '0';
   }
+  
+  let scale = window.devicePixelRatio;
+  this.cvs.setAttribute('width', sizeCSS.x * scale);
+  this.cvs.setAttribute('height', sizeCSS.y * scale);
+  this.cvs.style.width = sizeCSS.x + 'px';
+  this.cvs.style.height = sizeCSS.y + 'px';
+  
+  PICA.resize(this, this.cvs);
+  
 }
 
-function renderFeatured(container, item) {
-  if (!item) return;
-  const card = document.createElement('article');
-  card.className = 'featured-card';
-  const img = document.createElement('img');
-  img.alt = '';
-  img.loading = 'lazy';
-  img.src = item.media || '';
-  const body = document.createElement('div');
-  body.className = 'featured-body';
-  const title = document.createElement('h2');
-  title.className = 'featured-title';
-  title.textContent = item.title || '';
-  const desc = document.createElement('p');
-  desc.className = 'featured-desc';
-  desc.textContent = sanitize(item.content).slice(0, 280);
-  const link = document.createElement('a');
-  link.href = item.link || '#';
-  link.target = '_blank';
-  link.rel = 'noopener';
-  link.className = 'news-link';
-  link.textContent = 'Открыть';
-  body.appendChild(title);
-  body.appendChild(desc);
-  body.appendChild(link);
-  card.appendChild(img);
-  card.appendChild(body);
-  container.appendChild(card);
-}
+function prepImageDownscale(div, imageURL) {
+  // We need the background image in a new Image class both to send it to pica
+  // and to get it's original pixel dimensions, so we get the url from the div
+  // and clean it up
 
-function renderList(container, items) {
-  const frag = document.createDocumentFragment();
-  items.forEach((item) => {
-    const card = document.createElement('article');
-    card.className = 'news-card';
-    const img = document.createElement('img');
-    img.alt = '';
-    img.loading = 'lazy';
-    img.className = 'thumb';
-    img.src = item.media || '';
-    const body = document.createElement('div');
-    body.className = 'news-body';
-    const title = document.createElement('h3');
-    title.className = 'news-title';
-    title.textContent = item.title || '';
-    const meta = document.createElement('div');
-    meta.className = 'news-meta';
-    meta.textContent = fmtDate(item.date);
-    const link = document.createElement('a');
-    link.href = item.link || '#';
-    link.target = '_blank';
-    link.rel = 'noopener';
-    link.className = 'news-link';
-    link.textContent = 'Читать';
-    const desc = document.createElement('p');
-    desc.className = 'news-desc';
-    desc.textContent = sanitize(item.content).slice(0, 160);
-    body.appendChild(title);
-    body.appendChild(meta);
-    body.appendChild(desc);
-    body.appendChild(link);
-    card.appendChild(img);
-    card.appendChild(body);
-    frag.appendChild(card);
-  });
-  container.appendChild(frag);
-}
+  let img = new Image();
 
-(async function init() {
-  const featuredRoot = document.getElementById('featured');
-  const listRoot = document.getElementById('news-list');
-  try {
-    const data = await fetchNews();
-    if (!Array.isArray(data) || data.length === 0) {
-      listRoot.textContent = 'Пока нет новостей.';
-      return;
+  img.src = imageURL;
+
+  img.crossOrigin = 'Anonymous';
+  
+  // the canvas element will sit just inside the old div, overlapping the
+  // background image and clipped to the div's dimentions with overflow: hidden
+  let cvs = document.createElement('canvas');
+
+  div.style.position = 'relative';
+  div.style.overflow = 'hidden';
+  cvs.style.position = 'absolute';
+  div.appendChild(cvs);
+  img.cvs = cvs;
+  img.div = div;
+
+  
+  img.onload = rescaleToCanvas;
+  images.push(img);
+}
+//downscale-fix END
+
+function createArticles() {
+  getNewshub()
+    .then(data => {
+      dataLength = data.length;
+      let fixedLinkingOrder = data.length - 1;
+      for (let i = 0; i < data.length - 1; i++) {
+        clientSpawn.insertAdjacentHTML('afterbegin', `<a target='_blank' href="${data[fixedLinkingOrder].link}">
+    <div class="clientContainer column1">
+        <div class="clientImage"></div>
+        <div class="clientText">
+            <h1 class="clientTitle"></h1>
+            <div class="clientContent"></div>
+        </div>
+    </div>
+</a>`);
+
+        fixedLinkingOrder--;
+      }
+      clientMainFeature[0].insertAdjacentHTML('afterbegin', `<a class="featureSubGrid column9" target='_blank' href="${data[0].link}">
+    <div class="featureContainer column5">
+        <div class="featureImage"></div>
+    </div>
+    <div class="featureContainer column7">
+        <div class="featureText">
+            <h1 class="featureTitle"></h1>
+            <div class="featureContent"></div>
+        </div>
+    </div>
+</a>`);
+      return data;
+    }).then(data => {
+
+    let clientImage = document.querySelectorAll('.clientImage');
+    let clientTitle = document.querySelectorAll('.clientTitle');
+    let clientContent = document.querySelectorAll('.clientContent');
+    for (let i = 0; i < data.length - 1; i++) {
+      let content = data[i + 1].content;
+      clientImage[i].style.backgroundImage = `url("${data[i + 1].media}")`;
+      
+      //downscale-fix
+      prepImageDownscale(clientImage[i], `${data[i + 1].media}` );
+      //downscale-fix END
+      
+      clientTitle[i].innerHTML = `${data[i + 1].title}`;
+      clientContent[i].innerHTML = `${content.substring(0, 200)}`;
     }
-    // sort by sortIndex (desc) then by date (desc)
-    const normalized = data.slice().sort((a, b) => {
-      const idx = Number(b.sortIndex || 0) - Number(a.sortIndex || 0);
-      if (idx !== 0) return idx;
-      return new Date(b.date || 0) - new Date(a.date || 0);
+    let featureImage = document.querySelectorAll('.featureImage');
+    let featureTitle = document.querySelectorAll('.featureTitle');
+    let featureContent = document.querySelectorAll('.featureContent');
+    let content = data[0].content;
+    featureImage[0].style.backgroundImage = `url("${data[0].media}")`;
+    
+    //downscale-fix
+    prepImageDownscale(featureImage[0], `${data[0].media}` );
+    //downscale-fix END
+
+    featureTitle[0].innerHTML = `${data[0].title}`;
+    featureContent[0].innerHTML = `${content.substring(0, 400)}`;
+    
+  });
+}
+
+
+//downscale-fix
+
+let resizeTimer = null;
+let resizeFunction = function() {
+  images.forEach( (img) => {
+    img.onload();
+    img.cvs.style.display = 'block';
+  });
+};
+
+// delay after resize event before we do the downscale. The faf client behaved
+// erratically without it
+let resizeTime = 60;
+let resizeEventListener = function() {
+  {
+    clearTimeout(resizeTimer);
+    images.forEach( (img) => {
+      img.cvs.style.display = 'none';
     });
-    renderFeatured(featuredRoot, normalized[0]);
-    renderList(listRoot, normalized.slice(1));
-  } catch (e) {
-    console.error(e);
-    listRoot.textContent = 'Ошибка загрузки новостей.';
+    resizeTimer = setTimeout(resizeFunction, resizeTime);
   }
-})();
+};
+window.addEventListener('resize', resizeEventListener);
+
+//downscale-fix END
+
+createArticles();
+let arrowRight = document.getElementById('clientArrowRigth');
+let arrowLeft = document.getElementById('clientArrowLeft');
+let newsPosition = 0;
+let newsLimit = 0;
+let newsMove = clientContainer[0].offsetWidth;
+console.log(newsMove);
+let spawnStyle = getComputedStyle(clientSpawn).columnGap;
+let columnGap = spawnStyle.slice(0, 2);
+
+
+arrowRight.addEventListener('click', () => {
+  let newsMove = clientContainer[0].offsetWidth;
+  if (newsLimit === dataLength) {
+    console.log('limit reached');
+  } else {
+    newsLimit++;
+    newsPosition = newsPosition - newsMove;
+    clientSpawn.style.transform = `translateX(${newsPosition - columnGap}px)`;
+    arrowLeft.style.display = 'grid';
+  }
+});
+arrowLeft.addEventListener('click', () => {
+  let newsMove = clientContainer[0].offsetWidth;
+  if (newsLimit === 0) {
+  } else {
+    newsLimit--;
+    newsPosition = newsPosition + newsMove;
+    clientSpawn.style.transform = `translateX(${newsPosition - columnGap + 10}px)`;
+  }
+
+});
+addEventListener('resize', () => {
+  clientSpawn.style.transform = `translateX(0px)`;
+  newsPosition = 0;
+  newsLimit = 0;
+});
+
+let clientTournamentSpawn = document.getElementById('tournamentSpawn');
+function createTournaments() {
+  getTournament()
+    .then(data => {
+      if (!data || !data[0]) return;
+      clientTournamentSpawn.insertAdjacentHTML('beforeend', `${data[0].content}`);
+      return data;
+    });
+}
+
+createTournaments();
 
 
