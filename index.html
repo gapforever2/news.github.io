@@ -11,27 +11,85 @@
     <link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Russo+One&display=swap" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" />
     <link href="styles/css/site.min2.css" rel="stylesheet" />
+    <style>
+      .promoBar{
+        display:inline-block;
+        background:#b30000;
+        color:#ffffff;
+        padding:12px 24px;
+        font:700 18px/1.2 Tahoma, Arial, sans-serif;
+        margin:16px auto;
+        border:1px solid #7a0000;
+        text-transform:uppercase;
+        letter-spacing:.02em;
+        text-decoration:none;
+        border-radius:9999px;
+        text-align:center;
+        position:relative;
+      }
+      /* hover/focus - highlight to yellow */
+      .promoBar:hover,
+      .promoBar:focus{
+        background:#ffc107;
+        color:#000000;
+        border-color:#cc9a06;
+        outline:none;
+      }
+      /* center container */
+      .promoBar{display:block; width:max-content;}
+      /* tooltip */
+      .promoBar[data-title]:hover::after{
+        content:attr(data-title);
+        position:absolute;
+        bottom:calc(100% + 8px);
+        left:50%;
+        transform:translateX(-50%);
+        background:#000;
+        color:#fff;
+        padding:6px 8px;
+        border-radius:6px;
+        font:12px/1.2 Tahoma, Arial, sans-serif;
+        white-space:nowrap;
+        pointer-events:none;
+        opacity:.95;
+      }
+      .promoBar[data-title]:hover::before{
+        content:'';
+        position:absolute;
+        bottom:100%;
+        left:50%;
+        transform:translateX(-50%);
+        border:6px solid transparent;
+        border-top-color:#000;
+      }
+      .promoBar:hover{ text-decoration:none; }
+    </style>
   </head>
   <body>
     <div class="clientBackground">
       <div class="clientMainFeature">
         <div class="featureSubGrid column3 featureLink">
-          <div class="featureSocial column12">
-            <div class="featureLink featureDiscord column4">
-              <a target="_blank" href="https://discord.gg/">
+            <div class="featureSocial column12">
+             <div class="featureLink featureDiscord column3">
+               <a target="_blank" href="https://discord.gg/">
                 <img src="images/logos/discord.svg" alt="" />
               </a>
             </div>
-            <div class="featureLink featureTwitch column4">
-              <a target="_blank" href="https://www.twitch.tv/directory/game/Supreme%20Commander%3A%20Forged%20Alliance">
-                <img src="images/logos/twitch.png" alt="" />
+             <div class="featureLink featureTwitch column3">
+              <a target="_blank" href="https://www.twitch.tv/aiverse_">
+                 <img src="images/logos/twitch.png" alt="" />
               </a>
             </div>
-            <div class="featureLink featureYoutube column4">
-              <a target="_blank" href="https://www.youtube.com/channel/UChiCO27pbaXDR0d0JfxlIpw">
-                <img src="images/logos/youtube.png" alt="" />
+             <div class="featureLink featureYoutube column3">
+              <a target="_blank" href="https://www.youtube.com/@aiversefaf/featured">
+                 <img src="images/logos/youtube.png" alt="" />
               </a>
             </div>
+             <div class="featureLink featureTelegram column3" style="background-color:#229ED9;">
+               <a target="_blank" href="https://t.me/gapforever">
+                 <img src="images/logos/telegram.svg" alt="" />
+               </a>
+             </div>
             <div class="clientSupportFAF column12">
               <a target="_blank" href="https://boosty.to/gapforever.com">
                 <h2 style="font-family:Tahoma;font-size: 30px;" class="tooltip2" data-title="Подпишись на бусти для получения апупенной аватарки">
@@ -51,6 +109,8 @@
           </div>
         </div>
       </div>
+
+      <a class="promoBar" href="https://workspace.google.com/intl/ru/products/forms/" target="_blank" rel="noopener" data-title="Примите участие в опросе">ОПРОС ПО БАЛАНСУ</a>
 
       <div id="clientMain">
         <div id="clientSpawn" class="column12" style="grid-column: 1 / -1;"></div>
