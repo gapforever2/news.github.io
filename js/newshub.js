@@ -11,7 +11,7 @@ async function getTournament() {
 
 let dataLength = 0;
 let clientSpawn = document.getElementById('clientSpawn');
-let clientContainer = document.querySelectorAll('.clientContainer');
+function getClientContainers() { return document.querySelectorAll('.clientContainer'); }
 let clientMainFeature = document.querySelectorAll('.clientMainFeature');
 
 //downscale-fix
@@ -181,14 +181,15 @@ let arrowRight = document.getElementById('clientArrowRigth');
 let arrowLeft = document.getElementById('clientArrowLeft');
 let newsPosition = 0;
 let newsLimit = 0;
-let newsMove = clientContainer[0].offsetWidth;
-console.log(newsMove);
-let spawnStyle = getComputedStyle(clientSpawn).columnGap;
-let columnGap = spawnStyle.slice(0, 2);
+let initialContainers = getClientContainers();
+let newsMove = initialContainers[0] ? initialContainers[0].offsetWidth : 0;
+let spawnStyle = getComputedStyle(clientSpawn).columnGap || '0px';
+let columnGap = parseFloat(spawnStyle) || 0;
 
 
 arrowRight.addEventListener('click', () => {
-  let newsMove = clientContainer[0].offsetWidth;
+  const cc = getClientContainers();
+  let newsMove = cc[0] ? cc[0].offsetWidth : 0;
   if (newsLimit === dataLength) {
     console.log('limit reached');
   } else {
@@ -199,7 +200,8 @@ arrowRight.addEventListener('click', () => {
   }
 });
 arrowLeft.addEventListener('click', () => {
-  let newsMove = clientContainer[0].offsetWidth;
+  const cc = getClientContainers();
+  let newsMove = cc[0] ? cc[0].offsetWidth : 0;
   if (newsLimit === 0) {
   } else {
     newsLimit--;
