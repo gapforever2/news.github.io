@@ -181,8 +181,6 @@ let arrowRight = document.getElementById('clientArrowRigth');
 let arrowLeft = document.getElementById('clientArrowLeft');
 let newsPosition = 0;
 let newsLimit = 0;
-let initialContainers = getClientContainers();
-let newsMove = initialContainers[0] ? initialContainers[0].offsetWidth : 0;
 let spawnStyle = getComputedStyle(clientSpawn).columnGap || '0px';
 let columnGap = parseFloat(spawnStyle) || 0;
 
