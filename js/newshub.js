@@ -8,6 +8,16 @@ async function getTournament() {
   const data = await response.json();
   return await data;
 }
+async function getPromo() {
+  try {
+    const response = await fetch(`json/promo.json`, { cache: 'no-store' });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data;
+  } catch (_) {
+    return null;
+  }
+}
 
 let dataLength = 0;
 let clientSpawn = document.getElementById('clientSpawn');
@@ -225,5 +235,15 @@ function createTournaments() {
 }
 
 createTournaments();
+
+// promo link (e.g., poll button) coming from json/promo.json
+const promoAnchor = document.querySelector('.promoBar');
+if (promoAnchor) {
+  getPromo().then(p => {
+    if (p && p.pollLink) {
+      promoAnchor.href = p.pollLink;
+    }
+  });
+}
 
 

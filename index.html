@@ -63,10 +63,16 @@
         border-top-color:#000;
       }
       .promoBar:hover{ text-decoration:none; }
+
+      /* Slightly reduce vertical footprint of the news grid to avoid scroll */
+      #clientMain{ margin: 1vw 0; }
+      #clientSpawn a .clientContainer .clientImage{ padding: 4vw; }
     </style>
   </head>
   <body>
     <div class="clientBackground">
+      <a class="promoBar" href="https://workspace.google.com/intl/ru/products/forms/" target="_blank" rel="noopener" data-title="Примите участие в опросе">ОПРОС ПО БАЛАНСУ</a>
+
       <div class="clientMainFeature">
         <div class="featureSubGrid column3 featureLink">
             <div class="featureSocial column12">
@@ -109,8 +115,6 @@
           </div>
         </div>
       </div>
-
-      <a class="promoBar" href="https://workspace.google.com/intl/ru/products/forms/" target="_blank" rel="noopener" data-title="Примите участие в опросе">ОПРОС ПО БАЛАНСУ</a>
 
       <div id="clientMain">
         <div id="clientSpawn" class="column12" style="grid-column: 1 / -1;"></div>
