@@ -24,18 +24,23 @@ let clientSpawn = document.getElementById('clientSpawn');
 function getClientContainers() { return document.querySelectorAll('.clientContainer'); }
 let clientMainFeature = document.querySelectorAll('.clientMainFeature');
 
-//downscale-fix
-let PICA = new pica({ features: ['js', 'wasm', 'cib', 'ww'] });
+// --- client mode switch ---
+// JavaFX WebView renders background-image fine, but the canvas+pica overlay can end up blank and hide thumbnails.
+// Add `?client=1` to disable the downscale overlay entirely.
+const params = new URLSearchParams(window.location.search);
+const isClient = params.has('client');
 
+//downscale-fix (enabled only when NOT running inside the desktop client)
+const downscaleEnabled = !isClient && typeof window.pica === 'function';
+let PICA = null;
 let images = [];
 
 function rescaleToCanvas() {
-
+  if (!downscaleEnabled || !PICA) return;
 
   // this part should position the canvas such that it matches the original
   // background-image. the code assumes background image is centered and scaled
   // to cover the div
-
   let ratio = {
     x: this.div.offsetWidth / this.width,
     y: this.div.offsetHeight / this.height
@@ -44,7 +49,7 @@ function rescaleToCanvas() {
     x: 0,
     y: 0
   };
-  
+
   if (ratio.x > ratio.y) {
     let height = Math.round(this.height * ratio.x);
     sizeCSS.x = this.div.offsetWidth;
@@ -58,32 +63,28 @@ function rescaleToCanvas() {
     this.cvs.style.left = Math.round((this.div.offsetWidth - width) / 2) + 'px';
     this.cvs.style.top = '0';
   }
-  
+
   let scale = window.devicePixelRatio;
   this.cvs.setAttribute('width', sizeCSS.x * scale);
   this.cvs.setAttribute('height', sizeCSS.y * scale);
   this.cvs.style.width = sizeCSS.x + 'px';
   this.cvs.style.height = sizeCSS.y + 'px';
-  
+
   PICA.resize(this, this.cvs);
-  
 }
 
 function prepImageDownscale(div, imageURL) {
+  if (!downscaleEnabled || !PICA) return;
+
   // We need the background image in a new Image class both to send it to pica
-  // and to get it's original pixel dimensions, so we get the url from the div
-  // and clean it up
-
+  // and to get it's original pixel dimensions
   let img = new Image();
-
   img.src = imageURL;
-
   img.crossOrigin = 'Anonymous';
-  
+
   // the canvas element will sit just inside the old div, overlapping the
   // background image and clipped to the div's dimentions with overflow: hidden
   let cvs = document.createElement('canvas');
-
   div.style.position = 'relative';
   div.style.overflow = 'hidden';
   cvs.style.position = 'absolute';
@@ -91,9 +92,12 @@ function prepImageDownscale(div, imageURL) {
   img.cvs = cvs;
   img.div = div;
 
-  
   img.onload = rescaleToCanvas;
   images.push(img);
+}
+
+if (downscaleEnabled) {
+  PICA = new pica({ features: ['js', 'wasm', 'cib', 'ww'] });
 }
 //downscale-fix END
 
@@ -160,31 +164,27 @@ function createArticles() {
 }
 
 
-//downscale-fix
+//downscale-fix resize handlers (disabled for ?client=1)
+if (downscaleEnabled) {
+  let resizeTimer = null;
+  let resizeFunction = function() {
+    images.forEach((img) => {
+      img.onload();
+      img.cvs.style.display = 'block';
+    });
+  };
 
-let resizeTimer = null;
-let resizeFunction = function() {
-  images.forEach( (img) => {
-    img.onload();
-    img.cvs.style.display = 'block';
-  });
-};
-
-// delay after resize event before we do the downscale. The faf client behaved
-// erratically without it
-let resizeTime = 60;
-let resizeEventListener = function() {
-  {
+  // delay after resize event before we do the downscale. The faf client behaved erratically without it
+  let resizeTime = 60;
+  let resizeEventListener = function() {
     clearTimeout(resizeTimer);
-    images.forEach( (img) => {
+    images.forEach((img) => {
       img.cvs.style.display = 'none';
     });
     resizeTimer = setTimeout(resizeFunction, resizeTime);
-  }
-};
-window.addEventListener('resize', resizeEventListener);
-
-//downscale-fix END
+  };
+  window.addEventListener('resize', resizeEventListener);
+}
 
 createArticles();
 let arrowRight = document.getElementById('clientArrowRigth');
