@@ -1,5 +1,16 @@
 [    
-
+    {
+        "category": [
+            633
+        ],
+        "sortIndex": "1000",
+        "link": "https://www.youtube.com/watch?v=3pHh0AQjj3U",
+        "date": "2026-07-24T19:00:00",
+        "title": "test",
+        "content": "\n<p>Больше не нужно прокликивать каждый камень! На нашем сервере есть уникальная фишка, а именно — удобный реклейм!..</p>\n",
+        "author": "Aiverse",
+        "media": "https://raw.githubusercontent.com/gapforever2/news.github.io/refs/heads/master/images/preview/reclaim.jpg"
+    },
     {
         "category": [
             633
@@ -58,18 +69,5 @@
 		"media": "https://raw.githubusercontent.com/gapforever2/news.github.io/refs/heads/master/images/preview/backgroundcomm.png",
 		"title": "community bg",
 		"date": "2026-07-23T00:00:00"
-	},
-	
-	{
-        "category": [
-            633
-        ],
-        "sortIndex": "1000",
-        "link": "https://www.youtube.com/watch?v=3pHh0AQjj3U",
-        "date": "2024-02-01T19:00:00",
-        "title": "ГАЙД На Улучшенный Реклейм",
-        "content": "\n<p>Больше не нужно прокликивать каждый камень! На нашем сервере есть уникальная фишка, а именно — удобный реклейм!..</p>\n",
-        "author": "Aiverse",
-        "media": "https://raw.githubusercontent.com/gapforever2/news.github.io/refs/heads/master/images/preview/reclaim.jpg"
-    }
+	}
 ]
