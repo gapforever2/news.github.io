@@ -3,6 +3,18 @@
         "category": [
             633
         ],
+        "sortIndex": "1300",
+        "link": "https://gapforever2.github.io/patchnotes/balances/13.html#top",
+        "date": "2026-09-07T19:00:00",
+        "title": "GAF Патч «Бета-тест 13» — командиры и ауры",
+        "content": "\n<p>Большое обновление БМК и АКБП: новые поля поддержки, переработанные щиты, Titan, эффекты и исправления интерфейса. Патчноуты сверены с актуальным репозиторием игры.</p>\n",
+        "author": "GAF Balance Team",
+        "media": "https://raw.githubusercontent.com/gapforever2/news.github.io/refs/heads/master/images/preview/backgroundcomm.png"
+    },
+    {
+        "category": [
+            633
+        ],
         "sortIndex": "1000",
         "link": "https://www.youtube.com/watch?v=3pHh0AQjj3U",
         "date": "2026-07-24T19:00:00",
